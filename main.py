@@ -32,8 +32,11 @@ class ActorOutput:
         
 
 def parse_json(content: str) -> ActorOutput:
-    content = content.replace('```json', '').replace('```', '')
-
+    if "json" in content:
+        content = content.replace('```json', '').replace('```', '')
+    else:
+        end_index = content.find('}')
+        content = content[:end_index + 1]
     data = json.loads(content)
 
     words = data.get("words", "")
@@ -74,25 +77,35 @@ def main():
                                      , "chat_history": npc_history})
     npc_response_json = parse_json(npc_response['output'])
     npc_history.extend([HumanMessage(content=task_response['output']),AIMessage(content=npc_response['output'])])
-    print(f"[帕斯卡]{npc_response_json.words}\n({npc_response_json.action})" + "\n==============================================")
+    print(f"[帕斯卡]{npc_response_json.words}\n({npc_response_json.action})" + "\n==============================================")    
+    # player_history.append(HumanMessage(content=npc_response['output']))
 
     story_input = f"[任务系统]{task_response['output']}\n[帕斯卡]{npc_response_json.words}\n({npc_response_json.action})"
     story_response = story.agent.invoke({"input": story_input, "chat_history": story_history})
     story_history.extend([HumanMessage(content=story_input),AIMessage(content=story_response['output'])])
     print(f"[故事]{story_response['output']}" + "\n==============================================")
+
     
     while True:
         user_input = input(f"[Player]:")
         print("==============================================")
 
-        npc_response = npc.agent.invoke({"input":user_input
+        player_response = player.agent.invoke({"input": "[Ewan]帕斯卡," + user_input, "chat_history": player_history})
+        player_response_json = parse_json(player_response['output'])
+
+        print(f"[Ewan]{player_response_json.words}\n({player_response_json.action})" + "\n==============================================")
+
+        npc_response = npc.agent.invoke({"input":f"[Ewan]{player_response_json.words}\n({player_response_json.action})"
                                         , "chat_history": npc_history})
         npc_response_json = parse_json(npc_response['output'])
-        npc_history.extend([HumanMessage(content=user_input), AIMessage(content=npc_response['output'])])
+        npc_history.extend([HumanMessage(content=f"[Ewan]{player_response_json.words}\n({player_response_json.action})")
+                            , AIMessage(content=npc_response['output'])])
+
+        player_history.extend([AIMessage(content=player_response['output']),HumanMessage(content=npc_response['output'])])
 
         print(f"[帕斯卡]{npc_response_json.words}\n({npc_response_json.action})" + "\n==============================================")
 
-        story_input = f"[Ewan]{user_input} \n[帕斯卡]{npc_response_json.words}\n({npc_response_json.action})"
+        story_input = f"[Ewan]{player_response_json.words}\n({player_response_json.action})\n[帕斯卡]{npc_response_json.words}\n({npc_response_json.action})"
         story_response = story.agent.invoke({"input": story_input, "chat_history": story_history})
         story_history.extend([HumanMessage(content=story_input),AIMessage(content=story_response['output'])])
 
