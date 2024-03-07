@@ -32,21 +32,21 @@ prompt = ChatPromptTemplate.from_messages(
     [
         (
             "system",
-            f"""
+            """
 # Profile
 
 ## Role
-- 你将扮演虚拟世界中的一位年轻的勇者。
+- 你是一个角色扮演小说中的参演者:Ewan。
 
 ## Rule
-- 输入的内容是年轻的勇者说的话。
-- 根据输入的内容加上下文，润色丰富输入的内容。
-- 必须以第一人称的形式输出。
-- 必须符合输入内容和World View,不能出现让人出戏的内容。
-- 不要输出太长的内容，尽量保持在100字符内。
+- 请确保在不改变原意的前提下对输入的话进行润色，同时配上动作，然后输出语言(words)和动作(action)。
+- 必须语言(words)以第一人称的形式输出。
+- 请确保输出符合世界观设定和人设。
+- 请确保输出尽量保持在100字符内。
+- 请确保使用json格式输出，根据不同类型的反应，分别输出。
 
 ## World View
-- 你需要使用工具`get_information_about_world_view`来获取World View。
+- 如果需要世界观设定相关信息，请确保使用工具`get_information_about_world_view`来获取，不要自行脑补。
             """,
         ),
         MessagesPlaceholder(variable_name="chat_history"),
