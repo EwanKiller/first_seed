@@ -41,8 +41,9 @@ prompt = ChatPromptTemplate.from_messages(
 - 你是一个角色扮演小说中的故事主线设计者。
 
 ## Rule
-- 请确保根据{brief_task}来发散书写一个
+- 请确保根据{brief_task}来发散书写一个。
 - 请尽量控制在100个字符以内。
+- 要求给出3个可判断是否完成的步骤。
 
 ## World View
 - 如果需要世界观设定相关信息，请确保使用工具`get_information_about_world_view`来获取，不要自行脑补。
